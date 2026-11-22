@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Система управления результатами экзаменов студентов. Проект Java Spring Boot + Thymeleaf.">
+    <title>Student Exam Results — Результаты экзаменов</title>
+    <link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css">
+</head>
+<body>
+<div th:replace="~{fragments/nav :: navigation('students')}"></div>
+<main class="container page">
+    <div class="eyebrow"><span class="dot"></span> UNIVERSITY DASHBOARD <span class="eyebrow-divider">/</span> GRADING SYSTEM</div>
+    <div class="page-intro">
+        <div>
+            <h1>Результаты <span class="accent-text">экзаменов.</span></h1>
+            <p class="subtitle">Все студенты, баллы и итоговые оценки в одном месте.</p>
+        </div>
+        <div class="semester-chip"><span class="chip-icon">▦</span> Учебный проект · 2025</div>
+    </div>
+
+    <div th:if="${success}" class="alert" role="status">
+        <span>✓</span><span th:text="${success}">Успешно</span>
+        <button type="button" class="close-alert" aria-label="Закрыть" onclick="this.parentElement.remove()">×</button>
+    </div>
+
+    <section class="stats" aria-label="Статистика">
+        <div class="stat-card"><div class="stat-label">Всего студентов <span class="stat-icon">♙</span></div><div class="stat-number" th:text="${total}">6</div><div class="stat-detail">в системе</div></div>
+        <div class="stat-card"><div class="stat-label">Сдали экзамен <span class="stat-icon positive">↗</span></div><div class="stat-number" th:text="${passed}">5</div><div class="stat-detail"><span class="pill-dot good"></span> Оценка A — D</div></div>
+        <div class="stat-card"><div class="stat-label">Не сдали <span class="stat-icon negative">↘</span></div><div class="stat-number" th:text="${failed}">1</div><div class="stat-detail"><span class="pill-dot bad"></span> Оценка F</div></div>
+        <div class="stat-card"><div class="stat-label">Средний балл <span class="stat-icon">◉</span></div><div class="stat-number" th:text="${#numbers.formatDecimal(average, 1, 1)}">73.3</div><div class="stat-detail">из 100 возможных</div></div>
+    </section>
+
+    <section class="panel results-panel">
+        <div class="panel-top">
+            <div><div class="panel-kicker">ACADEMIC RECORDS</div><h2>Список студентов <span class="record-count" th:text="${total}">6</span></h2></div>
+            <a class="primary-button" th:href="@{/students/new}"><span aria-hidden="true">＋</span> Новый студент</a>
+        </div>
+        <div class="toolbar">
+            <form class="search-form" method="get" th:action="@{/students}" action="/students">
+                <div class="search-input-wrap"><span aria-hidden="true" class="search-icon">⌕</span><input type="search" name="q" aria-label="Поиск по имени или фамилии" placeholder="Поиск по имени или фамилии..." maxlength="100" th:value="${q}"></div>
+                <button type="submit" class="search-button">Найти</button>
+            </form>
+            <a th:if="${!#strings.isEmpty(q)}" class="clear-search" th:href="@{/students}">Сбросить поиск ×</a>
+        </div>
+        <div class="table-scroll">
+            <table class="students-table">
+                <thead><tr><th>ID</th><th>СТУДЕНТ</th><th>БАЛЛ</th><th>ОЦЕНКА</th><th>РЕЗУЛЬТАТ</th><th class="actions-heading">ДЕЙСТВИЯ</th></tr></thead>
+                <tbody>
+                    <tr th:each="student : ${students}">
+                        <td class="id-cell" th:text="${'#' + #numbers.formatInteger(student.id, 3)}">#001</td>
+                        <td><div class="student-info"><span class="avatar" th:text="${#strings.substring(student.name,0,1)}">A</span><div class="student-name"><strong th:text="${student.name + ' ' + student.surname}">Amina Sadykova</strong><small>Student</small></div></div></td>
+                        <td><div class="score-cell"><span class="score-strong" th:text="${student.exam}">96</span><span class="score-max">/ 100</span></div></td>
+                        <td><span class="grade-pill" th:classappend="${'grade-' + student.mark}" th:text="${student.mark}">A</span></td>
+                        <td><span class="status-badge" th:classappend="${student.mark == 'F'} ? 'status-failed' : 'status-passed'"><span class="status-dot"></span><span th:text="${student.mark == 'F'} ? 'Не сдал' : 'Сдал'">Сдал</span></span></td>
+                        <td><div class="actions"><a class="small-button" th:href="@{/students/{id}/edit(id=${student.id})}" title="Редактировать">Изменить</a><form th:action="@{/students/{id}/delete(id=${student.id})}" method="post" data-confirm-delete><button type="submit" class="delete-button" title="Удалить">Удалить</button></form></div></td>
+                    </tr>
+                    <tr th:if="${#lists.isEmpty(students)}"><td colspan="6" class="empty-state"><span class="empty-icon">◌</span><strong>Ничего не найдено</strong><p>Попробуйте другое имя или добавьте нового студента.</p><a th:href="@{/students/new}">Добавить студента</a></td></tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="panel-foot"><span>Показано: <strong th:text="${#lists.size(students)}">6</strong> из <strong th:text="${total}">6</strong></span><span>Оценки вычисляются автоматически</span></div>
+    </section>
+
+    <section class="grade-guide"><div class="grade-guide-title">Шкала оценивания <span>GRADING SCALE</span></div><div class="grade-track"><div class="scale-item"><b>A</b><span>90–100</span></div><div class="scale-item"><b>B</b><span>75–89</span></div><div class="scale-item"><b>C</b><span>60–74</span></div><div class="scale-item"><b>D</b><span>50–59</span></div><div class="scale-item scale-f"><b>F</b><span>0–49</span></div></div></section>
+    <footer class="footer"><span>Student Exam Results</span><span>Spring Boot 3.5.6 · Thymeleaf · Java 21</span></footer>
+</main>
+<script th:src="@{/js/app.js}" src="/js/app.js"></script>
+</body>
+</html>

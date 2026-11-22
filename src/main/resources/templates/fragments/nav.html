@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<body>
+<header th:fragment="navigation(activePage)" class="site-header">
+    <div class="container header-content">
+        <a class="brand" th:href="@{/students}" href="/students">
+            <span class="brand-mark">S<span class="brand-star">✦</span></span>
+            <span class="brand-label"><strong>STUDENT</strong><small>EXAM RESULTS</small></span>
+        </a>
+        <nav class="header-links" aria-label="Главная навигация">
+            <a class="nav-link" th:classappend="${activePage == 'students'} ? 'active' : ''" th:href="@{/students}">Результаты</a>
+            <a class="nav-add" th:href="@{/students/new}"><span aria-hidden="true">＋</span> Добавить студента</a>
+        </nav>
+    </div>
+</header>
+</body>
+</html>

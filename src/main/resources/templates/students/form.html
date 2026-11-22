@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>Student Exam Results — Форма студента</title><link rel="stylesheet" th:href="@{/css/style.css}" href="/css/style.css"></head>
+<body>
+<div th:replace="~{fragments/nav :: navigation('students')}"></div>
+<main class="container page form-page">
+    <a class="back-link" th:href="@{/students}">← Вернуться к списку</a>
+    <div class="eyebrow"><span class="dot"></span> STUDENT MANAGEMENT <span class="eyebrow-divider">/</span> EXAM RECORD</div>
+    <h1 th:text="${editing} ? 'Изменить результат.' : 'Новый студент.'">Новый студент.</h1>
+    <p class="subtitle" th:text="${editing} ? 'Обновите данные — оценка пересчитается автоматически.' : 'Добавьте студента и укажите его результат экзамена.'">Добавьте студента.</p>
+    <div class="form-layout">
+        <section class="panel form-card">
+            <div class="form-top"><span class="form-number">01 / STUDENT DETAILS</span><h2>Информация о студенте</h2><p>Все поля обязательны для заполнения.</p></div>
+            <form th:action="${editing} ? @{/students/{id}(id=${studentId})} : @{/students}" th:object="${studentForm}" method="post" novalidate="novalidate">
+                <div class="field-row">
+                    <div class="field"><label for="firstName">Имя</label><input id="firstName" type="text" th:field="*{name}" maxlength="80" placeholder="Например, Amina" autocomplete="given-name" required><span class="field-error" th:if="${#fields.hasErrors('name')}" th:errors="*{name}">Ошибка</span></div>
+                    <div class="field"><label for="surname">Фамилия</label><input id="surname" type="text" th:field="*{surname}" maxlength="80" placeholder="Например, Sadykova" autocomplete="family-name" required><span class="field-error" th:if="${#fields.hasErrors('surname')}" th:errors="*{surname}">Ошибка</span></div>
+                </div>
+                <div class="field"><label for="exam">Результат экзамена</label><div class="score-input-wrap"><input id="exam" type="number" th:field="*{exam}" min="0" max="100" step="1" placeholder="Введите балл от 0 до 100" required><span class="score-suffix">/ 100</span></div><span class="field-error" th:if="${#fields.hasErrors('exam')}" th:errors="*{exam}">Ошибка</span><span class="field-hint">Оценка A, B, C, D или F определяется автоматически по баллу.</span></div>
+                <div class="form-actions"><button type="submit" class="primary-button"><span>✓</span> <span th:text="${editing} ? 'Сохранить изменения' : 'Добавить студента'">Добавить студента</span></button><a class="secondary-button" th:href="@{/students}">Отмена</a></div>
+            </form>
+        </section>
+        <aside class="hint-card"><div class="hint-mark">✦</div><h3>Как выставляется оценка?</h3><p>Система автоматически определяет буквенную оценку на основании балла экзамена.</p><div class="hint-line"><b>A</b><span>90–100 баллов</span></div><div class="hint-line"><b>B</b><span>75–89 баллов</span></div><div class="hint-line"><b>C</b><span>60–74 балла</span></div><div class="hint-line"><b>D</b><span>50–59 баллов</span></div><div class="hint-line hint-f"><b>F</b><span>0–49 баллов · не сдал</span></div><div class="note"><strong>Важно:</strong> в этой учебной версии данные хранятся в оперативной памяти. После перезапуска сервера вернутся демонстрационные записи.</div></aside>
+    </div>
+    <footer class="footer"><span>Student Exam Results</span><span>Spring Boot 3.5.6 · Thymeleaf · Java 21</span></footer>
+</main>
+</body>
+</html>
